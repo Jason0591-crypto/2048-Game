@@ -1,8 +1,9 @@
 # Import the needed modules
 import random
 import os
+import time
 import timeit
-
+import math
 
 # Create the board and the points
 board = [[0, 0, 0, 0],
@@ -11,7 +12,6 @@ board = [[0, 0, 0, 0],
          [0, 0, 0, 0],
          ]
 points = 0
-# print(board)
 
 # The move commands in the game
 # W: up, S: down, A: left, D: right, E: exit game, R: restart
@@ -25,8 +25,11 @@ invalid = False
 
 # The function that is used to make the program set everything to the start of a new game
 def new_game():
-    # This statement allows the board and the counter for the points to be accessed and modified in this
-    # function.
+    print("This is a 2048 game, the controls are as the following: ")
+    print(" W: Up\n S: Down\n A: Left\n D: Right\n E: Exit\n R: Restart")
+    input("Press <ENTER> to Start")
+
+    # This statement allows the board and the counter for the points to be accessed and modified in this function.
     global board, status, last_move, points
     # The points and the board is set to 0
     board = [[0, 0, 0, 0],
@@ -70,7 +73,7 @@ def transpose():
         [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0]
-                 ]
+    ]
     for i in range(4):
         for j in range(4):
             new_board[i][j] = board[j][i]
@@ -110,7 +113,7 @@ def move_down():
             if board[j][i] == 0:
                 continue
             if board[top_index][i] == board[j][i]:
-                points = points + board[top_index][j] * 2
+                points += board[top_index][j] * 2
                 board[top_index][i] *= 2
                 board[j][i] = 0
                 top_index -= 1
@@ -134,8 +137,8 @@ def move_down():
             board[j][i] = 0
             # Checking if
     for k in range(4):
-        for l in range(4):
-            if board[k][l] == 2048:
+        for j in range(4):
+            if board[k][j] == 2048:
                 status = WIN
                 return True
     status = CONTINUE
@@ -193,7 +196,7 @@ def new_num():
     # The list of empty spaces on the board
     empty_space = list()
     # The numbers that could be put on the new block. Chosen randomly
-    new_block = random.choice([2, 2, 2, 2, 2, 2, 2, 2, 2, 4])
+    new_block = random.choice([2, 2, 2, 2, 4])
     # The two loops here view each block one by one and determine if they are empty.
     # For each one of the blocks that is empty, the loops add its index on the board to a list.
     for i in range(4):
@@ -241,16 +244,18 @@ def exit_or_restart():
     # Exit the game if the player entered "e"(exit) as the next move
     elif last_move == "e":
         exit()
+    else:
+        new_game()
 
 
 def last_input():
-    global status
+    global status, points
     # The initial output of this function
     output = f'last move: {last_move}'
     print(last_move)
     # Prints out a message to tell the player that they have lost the game
     if status == LOSE:
-        print("You have lost this game, try again later")
+        print("GAME OVER\nYou have lost this game, try again later")
         print("\nTotal Points:  ", points)
         input("Press <ENTER> to continue")
         exit_or_restart()
@@ -318,12 +323,16 @@ def input_valid(input_key):
 
 # Executes the moving commands of the board
 def execute_move():
+    # Move up if the user entered "w"
     if last_move == "w":
         move_up()
+    # Move down if the user entered "s"
     elif last_move == "s":
         move_down()
+    # Move left if the user entered "a"
     elif last_move == "a":
         move_left()
+    # Move right if the user entered "d"
     elif last_move == "d":
         move_right()
 
@@ -342,6 +351,7 @@ def print_screen():
 def game():
     # Start a new game
     new_game()
+    game_time = time.time()
     while True:
         # Prints the board and the number blocks on it
         print_board()
@@ -352,15 +362,25 @@ def game():
         #
         if invalid:
             continue
-        #
+        # If the user entered "e" or "r"
         if last_move in ('e', 'r'):
             # Print the total points the player got in this round of the game
             print("Total points:    ", points)
+            # Display the total time
+            current_time = time.time()
+
+            #
+            total_time = round(current_time - game_time, 2)
+            hours = int(total_time // 3600)
+            minutes = int((total_time % 3600) // 60)
+            seconds = round((total_time % 3600) % 60, 1)
+            print("Total game time:", hours, ":", minutes, ":", seconds)
             # Exit or restart the game, depending on the move the player entered
             exit_or_restart()
         else:
             # Move the number blocks on the board
             execute_move()
+            # Display the
             print(last_input())
             # Create new number blocks
             new_num()
