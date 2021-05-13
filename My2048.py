@@ -369,11 +369,12 @@ def game():
             # Display the total time
             current_time = time.time()
 
-            #
+            # Calculates the total time the game took
             total_time = round(current_time - game_time, 2)
             hours = int(total_time // 3600)
             minutes = int((total_time % 3600) // 60)
             seconds = round((total_time % 3600) % 60, 1)
+
             print("Total game time:", hours, ":", minutes, ":", seconds)
             # Exit or restart the game, depending on the move the player entered
             exit_or_restart()
